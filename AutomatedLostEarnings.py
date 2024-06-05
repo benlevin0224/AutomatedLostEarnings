@@ -1,29 +1,28 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import openpyxl
-from datetime import datetime
 import tkinter as tk
 from tkinter.filedialog import askopenfilename, askdirectory
 
-#Function to run the lost earnings calc
+
+# Function to run the lost earnings calc
 def lostearnings():
     path = askopenfilename()
     wb_obj = openpyxl.load_workbook(path)
     sh = wb_obj.active
 
-    URL = "https://www.askebsa.dol.gov/vfcpcalculator/webcalculator.aspx"
+    url = "https://www.askebsa.dol.gov/vfcpcalculator/webcalculator.aspx"
 
     driver = webdriver.Firefox()
-    driver.get(URL)
+    driver.get(url)
     assert "VFCP Calculator" in driver.title
 
     for i in range(2, sh.max_row + 1):
         print("\n")
-        principal = (sh.cell(row=i, column=2).value)
-        loss_date = (sh.cell(row=i, column=3).value)
-        recovery_date = (sh.cell(row=i, column=4).value)
-        final_payment_date =(sh.cell(row=i, column=5).value)
+        principal = sh.cell(row=i, column=2).value
+        loss_date = sh.cell(row=i, column=3).value
+        recovery_date = sh.cell(row=i, column=4).value
+        final_payment_date = sh.cell(row=i, column=5).value
         driver.find_element(By.ID, "_ctl0_MainContent_txtPrincipal").send_keys(principal)
         driver.find_element(By.ID, "_ctl0_MainContent_txtLossDateMonth").send_keys(loss_date.month)
         driver.find_element(By.ID, "_ctl0_MainContent_txtLossDateDay").send_keys(loss_date.day)
@@ -37,14 +36,15 @@ def lostearnings():
         driver.find_element(By.ID, "_ctl0_MainContent_cmdCalculate").click()
 
     driver.find_element(By.ID, "_ctl0_MainContent_cmdResults").click()
-    #driver.save_screenshot('/Users/benlevin/Desktop/test.png')
+    # driver.save_screenshot('/Users/benlevin/Desktop/test.png')
 
-    #driver.close()
+    # driver.close()
 
-#Function to generate new template that can be used for lost earnings
+
+# Function to generate new template that can be used for lost earnings
 def template():
     path = askdirectory()
-    filepath = path + "/lost earnings template.xlsx"
+    filepath = path + "/Lost Earnings Template.xlsx"
     wb = openpyxl.Workbook()
     ws = wb.worksheets[0]
     ws["A1"] = "Name"
@@ -54,19 +54,21 @@ def template():
     ws["E1"] = "Final Payment Date"
     wb.save(filepath)
 
+
 window = tk.Tk()
+
 window.geometry("400x400")
 window.title("Automated Lost Earnings")
 
 btn01 = tk.Button(
     window,
-    text="Run lost earnnings",
+    text="Run Lost Earnings",
     command=lostearnings,
 )
 
 btn02 = tk.Button(
     window,
-    text="create template",
+    text="Create Template",
     command=template,
 )
 
@@ -82,5 +84,3 @@ btn02.place(
     anchor="center",
 )
 window.mainloop()
-
-
